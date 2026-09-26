@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   MapPin, 
   Car, 
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
+import { i18n } from '../services/i18nService';
 
 export default function Navigation({ 
   activeTab, 
@@ -21,7 +22,13 @@ export default function Navigation({
   disruptionCount,
   currentUser 
 }) {
+  const [lang, setLang] = useState(i18n.getLanguage());
   const navContainerRef = useRef(null);
+
+  useEffect(() => {
+    const unsub = i18n.subscribe((l) => setLang(l));
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     if (navContainerRef.current) {
@@ -30,31 +37,31 @@ export default function Navigation({
         { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power2.out' }
       );
     }
-  }, [currentUser?.role]);
+  }, [currentUser?.role, lang]);
 
   const isControlRoom = currentUser?.role === 'CONTROL_ROOM';
 
-  // Role-adapted tabs
+  // Role-adapted tabs with i18n translations
   const tabs = isControlRoom ? [
     {
       id: 'map',
-      label: 'GIS Command Matrix',
+      label: i18n.t('tabMap', 'GIS Command Matrix'),
       icon: MapPin,
-      badge: `${vehicles?.length || 5} Active`,
+      badge: `${vehicles?.length || 5} ${i18n.t('active', 'Active')}`,
       badgeType: 'badge-cyan',
       description: 'Master GIS Fleet Telemetry & Multi-Modal Routing'
     },
     {
       id: 'mobility',
-      label: 'On-Demand Mobility',
+      label: i18n.t('tabMobility', 'On-Demand Mobility'),
       icon: Car,
-      badge: 'Live Dispatch',
+      badge: i18n.t('dispatch', 'Live Dispatch'),
       badgeType: 'badge-emerald',
       description: 'Cab Fleet Dispatch & Autonomous Ride Matching'
     },
     {
       id: 'freight',
-      label: 'Enterprise Freight',
+      label: i18n.t('tabFreight', 'Enterprise Freight'),
       icon: Truck,
       badge: 'Cold-Chain SLA',
       badgeType: 'badge-indigo',
@@ -62,40 +69,40 @@ export default function Navigation({
     },
     {
       id: 'movers',
-      label: 'Packers & Movers',
+      label: i18n.t('tabMovers', 'Packers & Movers'),
       icon: Package,
-      badge: 'Volumetric Engine',
+      badge: 'Volumetric',
       badgeType: 'badge-purple',
       description: 'Turnkey Relocation & Truck Allocation Matrix'
     },
     {
       id: 'ambulance',
-      label: 'Lifeline Emergency',
+      label: i18n.t('tabAmbulance', 'Lifeline Emergency'),
       icon: Siren,
-      badge: emergencyCount > 0 ? `${emergencyCount} Priority-0` : 'Standby',
+      badge: emergencyCount > 0 ? `${emergencyCount} Priority-0` : i18n.t('standby', 'Standby'),
       badgeType: 'badge-crimson',
       description: 'Code-Red Signal Preemption & Hospital Routing'
     },
     {
       id: 'disruption',
-      label: 'Disruption & Continuity',
+      label: i18n.t('tabDisruption', 'Disruption & Continuity'),
       icon: BrainCircuit,
-      badge: disruptionCount > 0 ? `${disruptionCount} Hazards` : 'Clear',
+      badge: disruptionCount > 0 ? `${disruptionCount} Hazards` : i18n.t('clear', 'Clear'),
       badgeType: 'badge-amber',
       description: 'Disruption Injection Sandbox & Corridor Healing'
     },
     {
       id: 'ai-studio',
-      label: 'Multimodal AI & CV',
+      label: i18n.t('tabAiStudio', 'Multimodal AI & CV'),
       icon: Cpu,
-      badge: 'Voice + Vision',
+      badge: 'Vision AI',
       badgeType: 'badge-cyan',
       description: 'Computer Vision Damage Scanner & Voice Ops'
     }
   ] : [
     {
       id: 'mobility',
-      label: 'Book Cab & Ride',
+      label: i18n.t('commuterTabMobility', 'Book Cab & Ride'),
       icon: Car,
       badge: 'Fast Dispatch',
       badgeType: 'badge-emerald',
@@ -103,15 +110,15 @@ export default function Navigation({
     },
     {
       id: 'movers',
-      label: 'Packers & Movers',
+      label: i18n.t('commuterTabMovers', 'Packers & Movers'),
       icon: Package,
-      badge: 'Volumetric Quote',
+      badge: '3D Estimate',
       badgeType: 'badge-purple',
       description: 'Calculate Luggage Volume & Instant Relocation'
     },
     {
       id: 'map',
-      label: 'Live Ride & Transit Tracker',
+      label: i18n.t('commuterTabMap', 'Live Ride Tracker'),
       icon: MapPin,
       badge: 'Live GPS',
       badgeType: 'badge-cyan',
@@ -119,7 +126,7 @@ export default function Navigation({
     },
     {
       id: 'ambulance',
-      label: 'Lifeline Emergency Aid',
+      label: i18n.t('commuterTabAmbulance', 'Emergency Aid'),
       icon: Siren,
       badge: emergencyCount > 0 ? 'Active Alert' : '24/7 Available',
       badgeType: 'badge-crimson',
@@ -127,17 +134,17 @@ export default function Navigation({
     },
     {
       id: 'disruption',
-      label: 'City Traffic Advisory',
+      label: i18n.t('commuterTabDisruption', 'City Traffic Advisory'),
       icon: BrainCircuit,
-      badge: disruptionCount > 0 ? `${disruptionCount} Alerts` : 'Clear',
+      badge: disruptionCount > 0 ? `${disruptionCount} Alerts` : i18n.t('clear', 'Clear'),
       badgeType: 'badge-amber',
       description: 'View Active Traffic Bottlenecks & Smart Detours'
     },
     {
       id: 'ai-studio',
-      label: 'AI Luggage Estimator',
+      label: i18n.t('commuterTabAiStudio', 'AI Luggage Estimator'),
       icon: Cpu,
-      badge: 'Smart CV',
+      badge: 'Vision CV',
       badgeType: 'badge-cyan',
       description: 'Scan household cargo & ask voice assistant'
     }
@@ -147,7 +154,6 @@ export default function Navigation({
     setActiveTab(tabId);
     soundFx.playRadarPing();
     
-    // GSAP Micro-click bounce
     if (e?.currentTarget) {
       gsap.fromTo(e.currentTarget,
         { scale: 0.94 },
@@ -182,7 +188,7 @@ export default function Navigation({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '9px',
-                  padding: '10px 16px',
+                  padding: '9px 15px',
                   borderRadius: '10px',
                   border: isActive ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid transparent',
                   background: isActive 
@@ -191,7 +197,7 @@ export default function Navigation({
                   color: isActive ? '#fde68a' : '#94a3b8',
                   cursor: 'pointer',
                   fontFamily: 'var(--font-heading)',
-                  fontSize: '13px',
+                  fontSize: '12.5px',
                   fontWeight: isActive ? '700' : '500',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                   whiteSpace: 'nowrap',
@@ -210,9 +216,9 @@ export default function Navigation({
                   }
                 }}
               >
-                <Icon size={16} color={isActive ? '#fbbf24' : '#94a3b8'} />
+                <Icon size={15} color={isActive ? '#fbbf24' : '#94a3b8'} />
                 <span>{tab.label}</span>
-                <span className={`badge-status ${tab.badgeType}`} style={{ fontSize: '10px', padding: '2px 7px' }}>
+                <span className={`badge-status ${tab.badgeType}`} style={{ fontSize: '9.5px', padding: '2px 6px' }}>
                   {tab.badge}
                 </span>
               </button>
@@ -225,7 +231,7 @@ export default function Navigation({
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '6px 12px',
+          padding: '5px 12px',
           borderRadius: '8px',
           background: isControlRoom ? 'rgba(245, 158, 11, 0.08)' : 'rgba(16, 185, 129, 0.08)',
           border: isControlRoom ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid rgba(16, 185, 129, 0.25)',
@@ -238,7 +244,7 @@ export default function Navigation({
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#fbbf24', letterSpacing: '0.04em' }}>
                 CONTROL ROOM HQ
               </span>
-              <span style={{ fontSize: '10px', color: '#94a3b8' }}>Level 5 Access</span>
+              <span style={{ fontSize: '10px', color: '#94a3b8' }}>Level 5</span>
             </>
           ) : (
             <>
@@ -246,7 +252,7 @@ export default function Navigation({
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#10b981', letterSpacing: '0.04em' }}>
                 COMMUTATOR PORTAL
               </span>
-              <span style={{ fontSize: '10px', color: '#94a3b8' }}>Client Tier</span>
+              <span style={{ fontSize: '10px', color: '#94a3b8' }}>Verified</span>
             </>
           )}
         </div>

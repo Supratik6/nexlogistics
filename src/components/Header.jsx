@@ -15,10 +15,16 @@ import {
   Siren,
   ChevronDown,
   Lock,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Bell,
+  Presentation,
+  Leaf,
+  BookOpen,
+  Languages
 } from 'lucide-react';
 import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
+import { i18n } from '../services/i18nService';
 
 export default function Header({ 
   system, 
@@ -27,25 +33,30 @@ export default function Header({
   onOpenVoiceModal, 
   onOpenAuthModal, 
   onOpenSosModal, 
-  onSwitchRole 
+  onSwitchRole,
+  onOpenStoryboard,
+  onOpenAnalytics,
+  onOpenArchitecture,
+  onToggleNotifications,
+  unreadNotificationsCount = 0
 }) {
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+  const [currentLang, setCurrentLang] = useState(i18n.getLanguage());
 
   const logoRef = useRef(null);
   const headerRef = useRef(null);
   const badgeRef = useRef(null);
   const sosBtnRef = useRef(null);
+  const storyboardBtnRef = useRef(null);
 
   // GSAP Smooth Header Entrance & Ambient Ring Pulse
   useEffect(() => {
-    // Header Fade Down
     gsap.fromTo(headerRef.current, 
       { y: -20, opacity: 0 }, 
       { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
     );
 
-    // Continuous Subtle Daffodils Logo Breathing Pulse
     if (logoRef.current) {
       gsap.to(logoRef.current, {
         boxShadow: '0 0 24px rgba(245, 158, 11, 0.45)',
@@ -56,13 +67,18 @@ export default function Header({
       });
     }
 
-    // Status Badge Pulse
     if (badgeRef.current) {
       gsap.fromTo(badgeRef.current,
         { scale: 0.98 },
         { scale: 1.02, repeat: -1, yoyo: true, duration: 2.2, ease: 'power1.inOut' }
       );
     }
+  }, []);
+
+  // Listen to language changes
+  useEffect(() => {
+    const unsubLang = i18n.subscribe((lang) => setCurrentLang(lang));
+    return () => unsubLang();
   }, []);
 
   // Pulse effect on SOS button if commuter is active
@@ -78,6 +94,19 @@ export default function Header({
     }
   }, [currentUser]);
 
+  // Subtle breathing shine on Mentor Storyboard button
+  useEffect(() => {
+    if (storyboardBtnRef.current) {
+      gsap.to(storyboardBtnRef.current, {
+        boxShadow: '0 0 16px rgba(245, 158, 11, 0.55)',
+        repeat: -1,
+        yoyo: true,
+        duration: 1.5,
+        ease: 'sine.inOut'
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString());
@@ -89,6 +118,10 @@ export default function Header({
     const muted = soundFx.toggleMute();
     setIsMuted(muted);
     if (!muted) soundFx.playRadarPing();
+  };
+
+  const handleLanguageChange = (lang) => {
+    i18n.setLanguage(lang);
   };
 
   const isControlRoom = currentUser?.role === 'CONTROL_ROOM';
@@ -142,13 +175,13 @@ export default function Header({
                 INTELLIGENCE PLATFORM
               </span>
               <span style={{ fontSize: '11px', color: '#94a3b8', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                Daffodils Engine v2.0
+                Daffodils Core v2.0
               </span>
             </div>
             <div style={{ fontSize: '11.5px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-              <span>Real-Time Mobility, Logistics & Continuity Intelligence Platform</span>
+              <span>{i18n.t('brandTagline')}</span>
               <span style={{ color: '#475569' }}>•</span>
-              <span style={{ color: '#fbbf24', fontStyle: 'italic' }}>“From Where Things Are → To What Happens Next”</span>
+              <span style={{ color: '#fbbf24', fontStyle: 'italic' }}>{i18n.t('motto')}</span>
             </div>
           </div>
         </div>
@@ -170,19 +203,126 @@ export default function Header({
             <span className="pulsing-green-dot"></span>
             <div>
               <div style={{ fontSize: '10px', color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.07em', fontWeight: '700' }}>
-                SYSTEM EVALUATION STATUS
+                {i18n.t('evaluationStatus')}
               </div>
               <div style={{ fontSize: '12px', fontWeight: '600', color: '#ffffff' }}>
-                {system?.phase || 'PHASE 1 & 2 ACTIVE [68.4% MILESTONE COMPLETED]'}
+                {system?.phase || i18n.t('milestoneBadge')}
               </div>
             </div>
           </div>
         </div>
 
-        {/* User Persona & Role Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        {/* Action Controls & Navigation Utilities */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '9px', flexWrap: 'wrap' }}>
           
-          {/* Commuter Emergency SOS Button (Active when in commuter mode) */}
+          {/* 1-Click Mentor Storyboard Showcase Button */}
+          <button
+            ref={storyboardBtnRef}
+            onClick={onOpenStoryboard}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 13px',
+              borderRadius: '9px',
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.2) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.55)',
+              color: '#fde68a',
+              fontWeight: '700',
+              fontSize: '11.5px',
+              cursor: 'pointer'
+            }}
+            title="Open Interactive Mentor Guided Presentation Storyboard"
+          >
+            <Presentation size={15} color="#fbbf24" />
+            <span>{i18n.t('storyboard')}</span>
+          </button>
+
+          {/* ESG Carbon Analytics Modal Trigger */}
+          <button
+            onClick={onOpenAnalytics}
+            className="btn-ghost"
+            style={{ padding: '6px 11px', fontSize: '11.5px', borderColor: 'rgba(16, 185, 129, 0.4)', color: '#6ee7b7' }}
+            title="View ESG Carbon Offset & Grid Analytics"
+          >
+            <Leaf size={14} />
+            <span>{i18n.t('analytics')}</span>
+          </button>
+
+          {/* Architecture Blueprint Modal Trigger */}
+          <button
+            onClick={onOpenArchitecture}
+            className="btn-ghost"
+            style={{ padding: '6px 11px', fontSize: '11.5px', borderColor: 'rgba(6, 182, 212, 0.4)', color: '#67e8f9' }}
+            title="View Academic Architecture Blueprint & Defense Dossier"
+          >
+            <BookOpen size={14} />
+            <span>{i18n.t('blueprint')}</span>
+          </button>
+
+          {/* Regional Multi-Language Selector Pill */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'rgba(15, 23, 42, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            padding: '2px',
+            gap: '2px'
+          }}>
+            <Languages size={13} color="#94a3b8" style={{ marginLeft: '6px', marginRight: '2px' }} />
+            {['EN', 'BN', 'HI'].map(lang => (
+              <button
+                key={lang}
+                onClick={() => handleLanguageChange(lang)}
+                style={{
+                  background: currentLang === lang ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
+                  border: currentLang === lang ? '1px solid rgba(245, 158, 11, 0.45)' : 'none',
+                  borderRadius: '6px',
+                  padding: '3px 7px',
+                  color: currentLang === lang ? '#fbbf24' : '#94a3b8',
+                  fontSize: '10.5px',
+                  fontWeight: currentLang === lang ? '800' : '500',
+                  cursor: 'pointer'
+                }}
+                title={lang === 'EN' ? 'English' : lang === 'BN' ? 'বাংলা (Bengali)' : 'हिंदी (Hindi)'}
+              >
+                {lang === 'EN' ? 'EN' : lang === 'BN' ? 'বাং' : 'हिं'}
+              </button>
+            ))}
+          </div>
+
+          {/* Live Notification Center Bell Button */}
+          <button
+            onClick={onToggleNotifications}
+            className="btn-ghost"
+            style={{
+              padding: '6px 10px',
+              position: 'relative',
+              borderColor: unreadNotificationsCount > 0 ? 'rgba(6, 182, 212, 0.5)' : 'rgba(255, 255, 255, 0.1)'
+            }}
+            title="Open Live Notification Stream"
+          >
+            <Bell size={15} color={unreadNotificationsCount > 0 ? '#06b6d4' : '#94a3b8'} />
+            {unreadNotificationsCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                background: '#06b6d4',
+                color: '#050811',
+                borderRadius: '10px',
+                padding: '1px 5px',
+                fontSize: '9.5px',
+                fontWeight: '900',
+                boxShadow: '0 0 8px #06b6d4'
+              }}>
+                {unreadNotificationsCount}
+              </span>
+            )}
+          </button>
+
+          {/* Commuter Emergency SOS Button (Active in commuter mode) */}
           {!isControlRoom && (
             <button
               ref={sosBtnRef}
@@ -191,20 +331,20 @@ export default function Header({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '7px 15px',
+                padding: '6px 14px',
                 borderRadius: '9px',
                 background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
                 color: '#ffffff',
                 border: '1px solid #f87171',
                 fontWeight: '800',
-                fontSize: '12px',
+                fontSize: '11.5px',
                 letterSpacing: '0.04em',
                 cursor: 'pointer',
                 boxShadow: '0 0 16px rgba(239, 68, 68, 0.5)'
               }}
             >
-              <Siren size={16} className="animate-spin" />
-              <span>EMERGENCY SOS</span>
+              <Siren size={15} className="animate-spin" />
+              <span>{i18n.t('emergencySos')}</span>
             </button>
           )}
 
@@ -214,9 +354,9 @@ export default function Header({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '9px',
-              padding: '5px 12px 5px 8px',
-              borderRadius: '10px',
+              gap: '8px',
+              padding: '4px 10px 4px 7px',
+              borderRadius: '9px',
               background: isControlRoom ? 'rgba(245, 158, 11, 0.12)' : 'rgba(16, 185, 129, 0.12)',
               border: isControlRoom ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid rgba(16, 185, 129, 0.35)',
               cursor: 'pointer',
@@ -225,58 +365,57 @@ export default function Header({
             title="Click to Switch Accounts or Open Login Dialog"
           >
             <div style={{
-              width: '28px',
-              height: '28px',
-              borderRadius: '7px',
+              width: '26px',
+              height: '26px',
+              borderRadius: '6px',
               background: isControlRoom ? '#f59e0b' : '#10b981',
               color: '#050811',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '800',
-              fontSize: '13px'
+              fontSize: '12px'
             }}>
               {currentUser?.name?.charAt(0) || 'U'}
             </div>
 
             <div>
-              <div style={{ fontSize: '12px', fontWeight: '700', color: '#ffffff', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '11.5px', fontWeight: '700', color: '#ffffff', lineHeight: 1.2 }}>
                 {currentUser?.name || 'Authorized User'}
               </div>
               <div style={{ 
-                fontSize: '10px', 
+                fontSize: '9.5px', 
                 color: isControlRoom ? '#fde68a' : '#a7f3d0', 
-                fontWeight: '600',
-                letterSpacing: '0.03em'
+                fontWeight: '600'
               }}>
-                {isControlRoom ? '🛡️ CONTROL ROOM COMMANDER' : '🚗 COMMUTATOR CLIENT'}
+                {isControlRoom ? i18n.t('controlRoomCommander') : i18n.t('commutatorClient')}
               </div>
             </div>
 
-            <ChevronDown size={14} color="#94a3b8" />
+            <ChevronDown size={13} color="#94a3b8" />
           </div>
 
-          {/* 1-Click Fast Persona Switch Pill (Ideal for College Presentation) */}
+          {/* 1-Click Fast Persona Switch Pill */}
           <button
             onClick={() => onSwitchRole(isControlRoom ? 'COMMUTATOR' : 'CONTROL_ROOM')}
             className="btn-ghost"
             style={{
-              padding: '6px 11px',
+              padding: '5px 10px',
               borderColor: 'rgba(255, 255, 255, 0.15)',
               fontSize: '11px',
               gap: '5px'
             }}
             title={isControlRoom ? 'Switch to Commutator Civilian View' : 'Switch to Master Control Room Operations'}
           >
-            <ArrowRightLeft size={13} color="#06b6d4" />
+            <ArrowRightLeft size={12} color="#06b6d4" />
             <span style={{ color: '#cbd5e1' }}>
-              {isControlRoom ? 'Switch to Commutator' : 'Switch to Control Room'}
+              {isControlRoom ? i18n.t('switchToCommutator') : i18n.t('switchToControlRoom')}
             </span>
           </button>
 
           {/* Telemetry Clock */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#cbd5e1', background: 'rgba(15,23,42,0.6)', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <Clock size={13} color="#fbbf24" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#cbd5e1', background: 'rgba(15,23,42,0.6)', padding: '5px 9px', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <Clock size={12} color="#fbbf24" />
             <span className="mono">{currentTime}</span>
           </div>
 
@@ -285,10 +424,10 @@ export default function Header({
             onClick={onOpenVoiceModal} 
             className="btn-ghost" 
             title="Open Conversational Voice Dispatcher"
-            style={{ borderColor: 'rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)' }}
+            style={{ borderColor: 'rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)', padding: '5px 9px' }}
           >
-            <Mic size={14} color="#fbbf24" />
-            <span style={{ color: '#fbbf24', fontSize: '11.5px' }}>Voice AI</span>
+            <Mic size={13} color="#fbbf24" />
+            <span style={{ color: '#fbbf24', fontSize: '11px' }}>{i18n.t('voiceAi')}</span>
           </button>
 
           {/* Sound Mute Toggle */}
@@ -296,8 +435,9 @@ export default function Header({
             onClick={handleToggleSound} 
             className="btn-ghost" 
             title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+            style={{ padding: '5px 8px' }}
           >
-            {isMuted ? <VolumeX size={14} color="#ef4444" /> : <Volume2 size={14} color="#10b981" />}
+            {isMuted ? <VolumeX size={13} color="#ef4444" /> : <Volume2 size={13} color="#10b981" />}
           </button>
 
           {/* Reset Demo Data Button */}
@@ -305,10 +445,10 @@ export default function Header({
             onClick={onReset} 
             className="btn-ghost" 
             title="Reset Data to Factory Demo State"
-            style={{ color: '#94a3b8' }}
+            style={{ color: '#94a3b8', padding: '5px 8px' }}
           >
-            <RotateCcw size={13} />
-            <span style={{ fontSize: '11.5px' }}>Reset</span>
+            <RotateCcw size={12} />
+            <span style={{ fontSize: '11px' }}>{i18n.t('reset')}</span>
           </button>
 
         </div>

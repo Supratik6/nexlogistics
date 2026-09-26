@@ -12,8 +12,13 @@ import VoiceModal from './components/VoiceModal';
 import AuthModal from './components/AuthModal';
 import InvoiceModal from './components/InvoiceModal';
 import SosModal from './components/SosModal';
+import NotificationCenter from './components/NotificationCenter';
+import PresentationModal from './components/PresentationModal';
+import ArchitectureModal from './components/ArchitectureModal';
+import AnalyticsModal from './components/AnalyticsModal';
 import { storageService } from './services/storageService';
 import { authService } from './services/authService';
+import { notificationService } from './services/notificationService';
 import { soundFx } from './services/soundService';
 import gsap from 'gsap';
 
@@ -29,6 +34,13 @@ export default function App() {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [invoiceData, setInvoiceData] = useState(null);
   const [isSosModalOpen, setIsSosModalOpen] = useState(false);
+  
+  // New Feature Modals state
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isStoryboardOpen, setIsStoryboardOpen] = useState(false);
+  const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(notificationService.getUnreadCount());
 
   const mainViewRef = useRef(null);
 
@@ -52,6 +64,14 @@ export default function App() {
     return () => unsubscribeAuth();
   }, []);
 
+  // Subscribe to notification service state changes
+  useEffect(() => {
+    const unsubNotif = notificationService.subscribe(() => {
+      setUnreadNotifications(notificationService.getUnreadCount());
+    });
+    return () => unsubNotif();
+  }, []);
+
   // When role changes, ensure active tab is appropriate
   useEffect(() => {
     if (currentUser?.role === 'COMMUTATOR' && activeTab === 'freight') {
@@ -72,18 +92,48 @@ export default function App() {
   const handleReset = () => {
     storageService.resetToDefault();
     setSelectedVehicle(null);
+    notificationService.addNotification({
+      title: 'Demo State Reset to Factory Defaults',
+      message: 'All telemetry caches, vehicles, and active disruption matrices reset.',
+      category: 'CONTINUITY',
+      severity: 'INFO'
+    });
   };
 
   const handleBookRide = (bookingData) => {
-    return storageService.createRideBooking(bookingData);
+    const res = storageService.createRideBooking(bookingData);
+    notificationService.addNotification({
+      title: 'Urban Mobility Ride Dispatched',
+      message: `${res.vehicle?.subType || 'EV Sedan'} assigned to ${bookingData.pickup}. OTP: ${Math.floor(1000 + Math.random() * 9000)}.`,
+      category: 'MOBILITY',
+      severity: 'INFO',
+      speakText: 'Mobility dispatch matched. Driver assigned and en route.'
+    });
+    return res;
   };
 
   const handleCreateMoversOrder = (orderData) => {
-    return storageService.createPackersMoversOrder(orderData);
+    const res = storageService.createPackersMoversOrder(orderData);
+    notificationService.addNotification({
+      title: 'Relocation Order Scheduled',
+      message: `Van ${res.assignedVehicle} reserved for ${orderData.customerName}. 6-Stage custody sealed.`,
+      category: 'MOVERS',
+      severity: 'SUCCESS',
+      speakText: 'Relocation order scheduled. Volumetric manifest and transit crew allocated.'
+    });
+    return res;
   };
 
   const handleDispatchAmbulance = (ambulanceRequest) => {
-    return storageService.dispatchAmbulance(ambulanceRequest);
+    const res = storageService.dispatchAmbulance(ambulanceRequest);
+    notificationService.addNotification({
+      title: 'Code-Red Priority-0 Lifeline Engaged',
+      message: `Mobile ICU unit dispatched. Green Wave signal preemption active for ${ambulanceRequest.location}.`,
+      category: 'EMERGENCY',
+      severity: 'CRITICAL',
+      speakText: 'Priority zero green wave corridor engaged. Emergency ambulance dispatched.'
+    });
+    return res;
   };
 
   const handleToggleDisruption = (disruptionId) => {
@@ -92,6 +142,13 @@ export default function App() {
 
   const handleExecuteReroute = (vehicleId) => {
     storageService.executeAutonomousReroute(vehicleId);
+    notificationService.addNotification({
+      title: 'Autonomous Reroute Completed',
+      message: `Vehicle ${vehicleId} successfully diverted onto optimal dynamic detour corridor.`,
+      category: 'CONTINUITY',
+      severity: 'SUCCESS',
+      speakText: 'Autonomous corridor rerouting executed. Grid bottleneck bypassed.'
+    });
   };
 
   const handleSelectVehicleFromAnywhere = (veh) => {
@@ -109,15 +166,29 @@ export default function App() {
     authService.switchRole(targetRole);
     if (targetRole === 'COMMUTATOR') {
       setActiveTab('mobility');
+      notificationService.addNotification({
+        title: 'Switched to Commutator Portal',
+        message: 'Active view set to Verified Citizen & Client operations.',
+        category: 'MOBILITY',
+        severity: 'INFO',
+        speakText: 'Switched to Commutator Client Portal.'
+      });
     } else {
       setActiveTab('map');
+      notificationService.addNotification({
+        title: 'Switched to Control Room HQ',
+        message: 'Level 5 Master Command clearance unlocked across all modules.',
+        category: 'CONTINUITY',
+        severity: 'INFO',
+        speakText: 'Control Room operations headquarters active.'
+      });
     }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'radial-gradient(ellipse at top, #0d1527 0%, #050811 100%)' }}>
       
-      {/* Top Command Header with User Profile Capsule & Emergency SOS */}
+      {/* Top Command Header with User Profile, Storyboard, ESG Analytics & Notifications */}
       <Header
         system={appState.system}
         currentUser={currentUser}
@@ -126,9 +197,14 @@ export default function App() {
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenSosModal={() => setIsSosModalOpen(true)}
         onSwitchRole={handleSwitchRole}
+        onOpenStoryboard={() => setIsStoryboardOpen(true)}
+        onOpenAnalytics={() => setIsAnalyticsOpen(true)}
+        onOpenArchitecture={() => setIsArchitectureOpen(true)}
+        onToggleNotifications={() => setIsNotificationsOpen(!isNotificationsOpen)}
+        unreadNotificationsCount={unreadNotifications}
       />
 
-      {/* Primary Navigation Tabs with Role Adaptation */}
+      {/* Primary Navigation Tabs with Role Adaptation & Multilingual Translation */}
       <Navigation
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -200,6 +276,31 @@ export default function App() {
           <AIStudioTab />
         )}
       </main>
+
+      {/* Live Notification Center Dropdown */}
+      <NotificationCenter
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+      />
+
+      {/* 1-Click Mentor Evaluation Storyboard Modal */}
+      <PresentationModal
+        isOpen={isStoryboardOpen}
+        onClose={() => setIsStoryboardOpen(false)}
+        onNavigateTab={(tabId) => setActiveTab(tabId)}
+      />
+
+      {/* Academic Architecture Blueprint & Defense Dossier Modal */}
+      <ArchitectureModal
+        isOpen={isArchitectureOpen}
+        onClose={() => setIsArchitectureOpen(false)}
+      />
+
+      {/* ESG Carbon Intelligence & Fleet Telematics Modal */}
+      <AnalyticsModal
+        isOpen={isAnalyticsOpen}
+        onClose={() => setIsAnalyticsOpen(false)}
+      />
 
       {/* Floating Voice Assistant Modal */}
       <VoiceModal
