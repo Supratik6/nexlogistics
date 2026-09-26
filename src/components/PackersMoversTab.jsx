@@ -13,12 +13,13 @@ import {
   Sparkles,
   Layers,
   ArrowRight,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
-export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicle, vehicles }) {
+export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicle, vehicles, onOpenInvoice }) {
   const [apartmentType, setApartmentType] = useState('2 BHK');
   const [packingTier, setPackingTier] = useState('Premium 3-Layer Foam & Bubble-Shield');
   const [customerName, setCustomerName] = useState('Dr. Arindam Roy');
@@ -142,6 +143,26 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => onOpenInvoice && onOpenInvoice({
+              type: 'MOVERS',
+              invoiceNumber: 'DAF-TAX-MOV-8842',
+              customerName: customerName || 'Dr. Arindam Roy',
+              customerPhone: phone || '+91 98310 98765',
+              pickup: pickupAddress,
+              dropoff: deliveryAddress,
+              vehicleModel: 'Daffodils Heavy Move-Hauler (DAF-MOV-02)',
+              volumetricWeightKg: 380,
+              baseFare: 8400,
+              totalFare: 9912,
+              otp: '8842'
+            })}
+            className="btn-ghost"
+            style={{ padding: '6px 12px', fontSize: '12px', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.4)' }}
+          >
+            <FileText size={14} />
+            <span>Digital Manifest / Invoice</span>
+          </button>
           <div className="glass-card" style={{ padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Box size={16} color="#a855f7" />
             <span style={{ fontSize: '12px', color: '#cbd5e1' }}>
@@ -409,22 +430,44 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
               </div>
 
               {/* Crew & Telematics Link */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                 <div style={{ fontSize: '11px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Users size={13} color="#a855f7" />
                   <span>{order.crewAssigned}</span>
                 </div>
-                <button
-                  onClick={() => {
-                    const moverVehicle = vehicles.find(v => v.id === order.assignedVehicle);
-                    if (moverVehicle) onSelectVehicle(moverVehicle);
-                  }}
-                  className="btn-ghost"
-                  style={{ fontSize: '11px', padding: '4px 10px', borderColor: 'rgba(168, 85, 247, 0.4)', color: '#c084fc' }}
-                >
-                  <Truck size={12} />
-                  <span>Track Van {order.assignedVehicle}</span>
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <button
+                    onClick={() => onOpenInvoice && onOpenInvoice({
+                      type: 'MOVERS',
+                      invoiceNumber: `DAF-TAX-${order.orderId}`,
+                      customerName: order.customerName,
+                      customerPhone: '+91 98310 98765',
+                      pickup: order.pickupAddress,
+                      dropoff: order.deliveryAddress,
+                      vehicleModel: `Daffodils Move-Hauler (${order.assignedVehicle})`,
+                      volumetricWeightKg: order.estimatedWeightKg,
+                      baseFare: Math.round(order.totalCost / 1.18),
+                      totalFare: order.totalCost,
+                      otp: '7291'
+                    })}
+                    className="btn-ghost"
+                    style={{ fontSize: '11px', padding: '4px 10px', borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
+                  >
+                    <FileText size={12} />
+                    <span>View Manifest</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const moverVehicle = vehicles.find(v => v.id === order.assignedVehicle);
+                      if (moverVehicle) onSelectVehicle(moverVehicle);
+                    }}
+                    className="btn-ghost"
+                    style={{ fontSize: '11px', padding: '4px 10px', borderColor: 'rgba(168, 85, 247, 0.4)', color: '#c084fc' }}
+                  >
+                    <Truck size={12} />
+                    <span>Track Van {order.assignedVehicle}</span>
+                  </button>
+                </div>
               </div>
 
             </div>

@@ -10,12 +10,13 @@ import {
   Clock, 
   User, 
   Star,
-  ArrowRight
+  ArrowRight,
+  FileText
 } from 'lucide-react';
 import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
-export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
+export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle, onOpenInvoice }) {
   const [pickup, setPickup] = useState('Howrah Station VIP Taxi Bay');
   const [destination, setDestination] = useState('Salt Lake Sector V IT Park');
   const [selectedTier, setSelectedTier] = useState('EV_SEDAN');
@@ -115,6 +116,25 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => onOpenInvoice && onOpenInvoice({
+              type: 'CAB',
+              invoiceNumber: 'DAF-TAX-CAB-3914',
+              customerName: 'Verified Commuter',
+              customerPhone: '+91 98310 99887',
+              pickup: pickup,
+              dropoff: destination,
+              vehicleModel: 'Executive Eco EV Sedan (WB-02-B-3788)',
+              otp: '9799',
+              baseFare: 285,
+              totalFare: 351
+            })}
+            className="btn-ghost"
+            style={{ padding: '6px 12px', fontSize: '12px', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.4)' }}
+          >
+            <FileText size={14} />
+            <span>Digital Trip Invoice</span>
+          </button>
           <div className="glass-card" style={{ padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Car size={16} color="#06b6d4" />
             <span style={{ fontSize: '12px', color: '#cbd5e1' }}>
@@ -268,17 +288,38 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
                 </div>
               </div>
 
-              <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                 <span style={{ fontSize: '12px', color: '#cbd5e1' }}>
                   Trip ID: <span className="mono" style={{ color: '#06b6d4' }}>{matchedBooking.bookingId}</span>
                 </span>
-                <button
-                  onClick={() => onSelectVehicle(matchedBooking.vehicle)}
-                  className="btn-ghost"
-                  style={{ fontSize: '11px', padding: '4px 10px', color: '#22d3ee' }}
-                >
-                  Track on GIS Map
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    onClick={() => onOpenInvoice && onOpenInvoice({
+                      type: 'CAB',
+                      invoiceNumber: `DAF-TAX-${matchedBooking.bookingId}`,
+                      customerName: 'Verified Commuter',
+                      customerPhone: '+91 98310 99887',
+                      pickup: pickup,
+                      dropoff: destination,
+                      vehicleModel: `${matchedBooking.vehicleName} (${matchedBooking.plate})`,
+                      otp: matchedBooking.otp,
+                      baseFare: Math.round(matchedBooking.fare / 1.18),
+                      totalFare: matchedBooking.fare
+                    })}
+                    className="btn-ghost"
+                    style={{ fontSize: '11px', padding: '4px 10px', color: '#fbbf24', borderColor: 'rgba(245, 158, 11, 0.4)' }}
+                  >
+                    <FileText size={12} />
+                    <span>View Tax Invoice</span>
+                  </button>
+                  <button
+                    onClick={() => onSelectVehicle(matchedBooking.vehicle)}
+                    className="btn-ghost"
+                    style={{ fontSize: '11px', padding: '4px 10px', color: '#22d3ee' }}
+                  >
+                    Track on GIS Map
+                  </button>
+                </div>
               </div>
             </div>
           )}

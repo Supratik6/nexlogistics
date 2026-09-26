@@ -9,18 +9,33 @@ import {
   Clock, 
   Wifi,
   Sparkles,
-  Layers
+  Layers,
+  User,
+  Shield,
+  Siren,
+  ChevronDown,
+  Lock,
+  ArrowRightLeft
 } from 'lucide-react';
 import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
-export default function Header({ system, onReset, onOpenVoiceModal }) {
+export default function Header({ 
+  system, 
+  currentUser, 
+  onReset, 
+  onOpenVoiceModal, 
+  onOpenAuthModal, 
+  onOpenSosModal, 
+  onSwitchRole 
+}) {
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
   const logoRef = useRef(null);
   const headerRef = useRef(null);
   const badgeRef = useRef(null);
+  const sosBtnRef = useRef(null);
 
   // GSAP Smooth Header Entrance & Ambient Ring Pulse
   useEffect(() => {
@@ -50,6 +65,19 @@ export default function Header({ system, onReset, onOpenVoiceModal }) {
     }
   }, []);
 
+  // Pulse effect on SOS button if commuter is active
+  useEffect(() => {
+    if (sosBtnRef.current && currentUser?.role === 'COMMUTATOR') {
+      gsap.to(sosBtnRef.current, {
+        boxShadow: '0 0 22px rgba(239, 68, 68, 0.8)',
+        repeat: -1,
+        yoyo: true,
+        duration: 0.9,
+        ease: 'sine.inOut'
+      });
+    }
+  }, [currentUser]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleTimeString());
@@ -62,6 +90,8 @@ export default function Header({ system, onReset, onOpenVoiceModal }) {
     setIsMuted(muted);
     if (!muted) soundFx.playRadarPing();
   };
+
+  const isControlRoom = currentUser?.role === 'CONTROL_ROOM';
 
   return (
     <header 
@@ -123,7 +153,7 @@ export default function Header({ system, onReset, onOpenVoiceModal }) {
           </div>
         </div>
 
-        {/* Strategic Academic FYP Milestone Badge */}
+        {/* Academic FYP Milestone Badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div 
             ref={badgeRef}
@@ -143,36 +173,122 @@ export default function Header({ system, onReset, onOpenVoiceModal }) {
                 SYSTEM EVALUATION STATUS
               </div>
               <div style={{ fontSize: '12px', fontWeight: '600', color: '#ffffff' }}>
-                {system?.phase || 'PHASE 1 & 2 ACTIVE [68.4% MILESTONE]'}
+                {system?.phase || 'PHASE 1 & 2 ACTIVE [68.4% MILESTONE COMPLETED]'}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Telemetry Status Metrics & Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        {/* User Persona & Role Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           
-          {/* Live Telemetry Clock */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#cbd5e1', background: 'rgba(15,23,42,0.6)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <Clock size={14} color="#fbbf24" />
+          {/* Commuter Emergency SOS Button (Active when in commuter mode) */}
+          {!isControlRoom && (
+            <button
+              ref={sosBtnRef}
+              onClick={onOpenSosModal}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '7px 15px',
+                borderRadius: '9px',
+                background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+                color: '#ffffff',
+                border: '1px solid #f87171',
+                fontWeight: '800',
+                fontSize: '12px',
+                letterSpacing: '0.04em',
+                cursor: 'pointer',
+                boxShadow: '0 0 16px rgba(239, 68, 68, 0.5)'
+              }}
+            >
+              <Siren size={16} className="animate-spin" />
+              <span>EMERGENCY SOS</span>
+            </button>
+          )}
+
+          {/* User Account Capsule */}
+          <div 
+            onClick={onOpenAuthModal}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '9px',
+              padding: '5px 12px 5px 8px',
+              borderRadius: '10px',
+              background: isControlRoom ? 'rgba(245, 158, 11, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+              border: isControlRoom ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid rgba(16, 185, 129, 0.35)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            title="Click to Switch Accounts or Open Login Dialog"
+          >
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '7px',
+              background: isControlRoom ? '#f59e0b' : '#10b981',
+              color: '#050811',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '800',
+              fontSize: '13px'
+            }}>
+              {currentUser?.name?.charAt(0) || 'U'}
+            </div>
+
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: '700', color: '#ffffff', lineHeight: 1.2 }}>
+                {currentUser?.name || 'Authorized User'}
+              </div>
+              <div style={{ 
+                fontSize: '10px', 
+                color: isControlRoom ? '#fde68a' : '#a7f3d0', 
+                fontWeight: '600',
+                letterSpacing: '0.03em'
+              }}>
+                {isControlRoom ? '🛡️ CONTROL ROOM COMMANDER' : '🚗 COMMUTATOR CLIENT'}
+              </div>
+            </div>
+
+            <ChevronDown size={14} color="#94a3b8" />
+          </div>
+
+          {/* 1-Click Fast Persona Switch Pill (Ideal for College Presentation) */}
+          <button
+            onClick={() => onSwitchRole(isControlRoom ? 'COMMUTATOR' : 'CONTROL_ROOM')}
+            className="btn-ghost"
+            style={{
+              padding: '6px 11px',
+              borderColor: 'rgba(255, 255, 255, 0.15)',
+              fontSize: '11px',
+              gap: '5px'
+            }}
+            title={isControlRoom ? 'Switch to Commutator Civilian View' : 'Switch to Master Control Room Operations'}
+          >
+            <ArrowRightLeft size={13} color="#06b6d4" />
+            <span style={{ color: '#cbd5e1' }}>
+              {isControlRoom ? 'Switch to Commutator' : 'Switch to Control Room'}
+            </span>
+          </button>
+
+          {/* Telemetry Clock */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', color: '#cbd5e1', background: 'rgba(15,23,42,0.6)', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <Clock size={13} color="#fbbf24" />
             <span className="mono">{currentTime}</span>
           </div>
 
-          {/* Latency */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#cbd5e1', background: 'rgba(15,23,42,0.6)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <Wifi size={14} color="#10b981" />
-            <span className="mono">{system?.avgNetworkLatencyMs || 24}ms</span>
-          </div>
-
-          {/* Voice Dispatch AI Quick Trigger */}
+          {/* Voice Dispatch AI Trigger */}
           <button 
             onClick={onOpenVoiceModal} 
             className="btn-ghost" 
             title="Open Conversational Voice Dispatcher"
             style={{ borderColor: 'rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)' }}
           >
-            <Mic size={15} color="#fbbf24" />
-            <span style={{ color: '#fbbf24' }}>Voice AI</span>
+            <Mic size={14} color="#fbbf24" />
+            <span style={{ color: '#fbbf24', fontSize: '11.5px' }}>Voice AI</span>
           </button>
 
           {/* Sound Mute Toggle */}
@@ -181,7 +297,7 @@ export default function Header({ system, onReset, onOpenVoiceModal }) {
             className="btn-ghost" 
             title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
           >
-            {isMuted ? <VolumeX size={15} color="#ef4444" /> : <Volume2 size={15} color="#10b981" />}
+            {isMuted ? <VolumeX size={14} color="#ef4444" /> : <Volume2 size={14} color="#10b981" />}
           </button>
 
           {/* Reset Demo Data Button */}
@@ -191,8 +307,8 @@ export default function Header({ system, onReset, onOpenVoiceModal }) {
             title="Reset Data to Factory Demo State"
             style={{ color: '#94a3b8' }}
           >
-            <RotateCcw size={14} />
-            <span style={{ fontSize: '12px' }}>Reset State</span>
+            <RotateCcw size={13} />
+            <span style={{ fontSize: '11.5px' }}>Reset</span>
           </button>
 
         </div>
