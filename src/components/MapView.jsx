@@ -40,10 +40,11 @@ export default function MapView({ vehicles, disruptions, emergencyAlerts, onSele
         attributionControl: false
       });
 
-      // CartoDB Dark Matter Tiles (High-contrast, sleek military/cyber dark mode)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      // OpenStreetMap Free Global Tiles (Zero API Key required, 100% free for GitHub Pages)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        subdomains: 'abcd'
+        subdomains: 'abc',
+        attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
       // Add Zoom control at top-right

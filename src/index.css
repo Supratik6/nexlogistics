@@ -289,6 +289,15 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
 }
 
+/* High-Tech Cyber Dark Mode for OpenStreetMap Tiles (Zero API Key needed, 100% Free Forever) */
+.leaflet-tile {
+  filter: brightness(0.65) invert(1) contrast(2.8) hue-rotate(200deg) saturate(0.35) brightness(0.75) !important;
+}
+
+.leaflet-tile-loaded {
+  transition: opacity 0.2s ease-in-out;
+}
+
 .leaflet-bar a {
   background-color: #0d162b !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
