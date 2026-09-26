@@ -1,4 +1,4 @@
-name: Deploy VYONEX to GitHub Pages
+name: Deploy DAFFODILS to GitHub Pages
 
 on:
   push:
