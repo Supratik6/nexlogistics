@@ -1,14 +1,14 @@
-// VYONEX Unified Data & Telematics Service (ACCESSNEXA Integrated)
+// Daffodils Unified Data & Telematics Service (Continuity Intelligence Platform)
 import { soundFx } from './soundService';
 
-const STORAGE_KEY = 'vyonex_command_state_v1';
+const STORAGE_KEY = 'daffodils_command_state_v2';
 
 // Initial High-Fidelity Dataset
 const INITIAL_DATA = {
   system: {
     status: 'OPERATIONAL',
-    phase: 'PHASE 1 & 2 ACTIVE [68.4% COMPLETED]',
-    version: 'ACCESSNEXA v1.4.2-PROD',
+    phase: 'PHASE 1 & 2 ACTIVE [68.4% MILESTONE]',
+    version: 'Daffodils Engine v2.0-PROD',
     telemetryRateMs: 2000,
     activeMissionsCount: 6,
     avgNetworkLatencyMs: 24,
@@ -17,7 +17,7 @@ const INITIAL_DATA = {
   // Fleet & Mobility Units
   vehicles: [
     {
-      id: 'VN-CAB-101',
+      id: 'DAF-CAB-101',
       type: 'CAB',
       subType: 'Executive EV Sedan',
       driverName: 'Vikramaditya Sen',
@@ -40,7 +40,7 @@ const INITIAL_DATA = {
       currentStep: 0
     },
     {
-      id: 'VN-FRT-502',
+      id: 'DAF-FRT-502',
       type: 'FREIGHT',
       subType: 'Cold-Chain Pharma Reefer (14ft)',
       driverName: 'Harminder Singh',
@@ -67,7 +67,7 @@ const INITIAL_DATA = {
       currentStep: 0
     },
     {
-      id: 'VN-MOV-303',
+      id: 'DAF-MOV-303',
       type: 'MOVER',
       subType: 'Heavy Relocation Van (19ft Eicher)',
       driverName: 'Prabhat Mukherjee',
@@ -92,7 +92,7 @@ const INITIAL_DATA = {
       currentStep: 0
     },
     {
-      id: 'VN-AMB-911',
+      id: 'DAF-AMB-911',
       type: 'AMBULANCE',
       subType: 'Type-C Advanced Life Support (ALS)',
       driverName: 'Somenath Roy (EMT: Dr. K. Bose)',
@@ -124,7 +124,7 @@ const INITIAL_DATA = {
       currentStep: 0
     },
     {
-      id: 'VN-CAB-104',
+      id: 'DAF-CAB-104',
       type: 'CAB',
       subType: 'Smart Micro-Transit Eco',
       driverName: 'Arjun Das',
@@ -154,12 +154,12 @@ const INITIAL_DATA = {
       deliveryAddress: 'Tower 4, Uniworld City, New Town Action Area III',
       totalVolumeCuFt: 580,
       estimatedWeightKg: 1450,
-      assignedVehicle: 'VN-MOV-303',
+      assignedVehicle: 'DAF-MOV-303',
       crewAssigned: 'Crew Alpha (Lead: Subhashis, 3 Specialists)',
       packingTier: 'Premium 3-Layer Foam & Bubble-Shield',
       insuranceValue: '₹ 8,50,000',
       totalCost: 14800,
-      currentStage: 3, // 0: Quote, 1: Crew Assigned, 2: Packing, 3: In Transit, 4: Unloading, 5: Verified
+      currentStage: 3,
       stages: [
         { label: 'Inventory Audited & Approved', done: true, time: '08:30 AM' },
         { label: 'Relocation Crew & Truck Dispatched', done: true, time: '09:15 AM' },
@@ -189,7 +189,7 @@ const INITIAL_DATA = {
       conditionSummary: 'Acute Chest Pain, ST-Elevation Suspicion',
       pickupLocation: 'Bhowanipore Metro Gate 2',
       destinationHospital: 'Apex Cardiac & Trauma Care (Emergency Bay 3)',
-      ambulanceId: 'VN-AMB-911',
+      ambulanceId: 'DAF-AMB-911',
       distanceRemainingKm: 3.8,
       etaMins: 7,
       greenCorridorActive: true,
@@ -202,7 +202,7 @@ const INITIAL_DATA = {
     }
   ],
 
-  // ACCESSNEXA Active Disruption Graph
+  // Daffodils Active Disruption Graph
   disruptions: [
     {
       id: 'DIS-001',
@@ -222,8 +222,8 @@ const INITIAL_DATA = {
 
   // Audit Logs
   auditLogs: [
-    { timestamp: new Date(Date.now() - 3600000).toLocaleTimeString(), event: 'ACCESSNEXA: Telematics stream initialized for Sector 1-5' },
-    { timestamp: new Date(Date.now() - 2400000).toLocaleTimeString(), event: 'LIFELINE: Emergency Code Red dispatched to VN-AMB-911' },
+    { timestamp: new Date(Date.now() - 3600000).toLocaleTimeString(), event: 'DAFFODILS: Telematics stream initialized for Sector 1-5' },
+    { timestamp: new Date(Date.now() - 2400000).toLocaleTimeString(), event: 'LIFELINE: Emergency Code Red dispatched to DAF-AMB-911' },
     { timestamp: new Date(Date.now() - 1200000).toLocaleTimeString(), event: 'DISRUPTION: Anomaly detected at Maa Flyover Ramp, impact evaluated' },
     { timestamp: new Date(Date.now() - 300000).toLocaleTimeString(), event: 'MOVERS: Staging verification completed for Order #PM-2026-881' }
   ]
@@ -242,9 +242,7 @@ class StorageService {
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch {
-      // Fallback
-    }
+    } catch {}
     this.saveState(INITIAL_DATA);
     return JSON.parse(JSON.stringify(INITIAL_DATA));
   }
@@ -297,14 +295,12 @@ class StorageService {
         let newLat = v.currentLat + latDelta;
         let newLng = v.currentLng + lngDelta;
 
-        // If very close to waypoint, switch to next waypoint
         const dist = Math.sqrt(Math.pow(targetPt[0] - newLat, 2) + Math.pow(targetPt[1] - newLng, 2));
         let updatedStep = currentStep;
         if (dist < 0.001) {
           updatedStep = nextStep;
         }
 
-        // Slight speed oscillation to look natural
         const speedNoise = (Math.random() - 0.5) * 4;
         const nextSpeed = Math.max(15, Math.min(85, Math.round(v.speedKmh + speedNoise)));
 
@@ -327,7 +323,7 @@ class StorageService {
   createRideBooking({ pickup, destination, rideType, fare }) {
     const bookingId = `BK-${Math.floor(1000 + Math.random() * 9000)}`;
     const newVehicle = {
-      id: `VN-CAB-${Math.floor(200 + Math.random() * 800)}`,
+      id: `DAF-CAB-${Math.floor(200 + Math.random() * 800)}`,
       type: 'CAB',
       subType: rideType.name,
       driverName: 'Rameshwar Mahato',
@@ -377,7 +373,7 @@ class StorageService {
       deliveryAddress: orderData.deliveryAddress || 'Highland Park Tower 2',
       totalVolumeCuFt: orderData.volumeCuFt || 480,
       estimatedWeightKg: Math.round((orderData.volumeCuFt || 480) * 2.5),
-      assignedVehicle: 'VN-MOV-303',
+      assignedVehicle: 'DAF-MOV-303',
       crewAssigned: 'Crew Beta (Lead: Ashish Roy, 3 Pros)',
       packingTier: orderData.packingTier || 'Premium 3-Layer Shield',
       insuranceValue: `₹ ${Number(orderData.insuranceValue || 500000).toLocaleString('en-IN')}`,
@@ -416,7 +412,7 @@ class StorageService {
       conditionSummary: ambulanceRequest.condition || 'Severe Trauma / Respiratory Distress',
       pickupLocation: ambulanceRequest.pickupLocation || 'Park Street Crossing',
       destinationHospital: ambulanceRequest.destinationHospital || 'Apex Medical Trauma Bay',
-      ambulanceId: 'VN-AMB-911',
+      ambulanceId: 'DAF-AMB-911',
       distanceRemainingKm: 4.2,
       etaMins: 6,
       greenCorridorActive: true,
@@ -426,9 +422,8 @@ class StorageService {
       ]
     };
 
-    // Update vehicle to emergency corridor active
     this.data.vehicles = this.data.vehicles.map(v => {
-      if (v.id === 'VN-AMB-911') {
+      if (v.id === 'DAF-AMB-911') {
         return {
           ...v,
           status: 'EMERGENCY_CORRIDOR_ACTIVE',
@@ -451,7 +446,7 @@ class StorageService {
     return newAlert;
   }
 
-  // Inject or Toggle Disruption in ACCESSNEXA
+  // Inject or Toggle Disruption in Daffodils
   toggleDisruption(disruptionId) {
     this.data.disruptions = this.data.disruptions.map(d => {
       if (d.id === disruptionId) {
@@ -463,7 +458,7 @@ class StorageService {
 
     const target = this.data.disruptions.find(d => d.id === disruptionId);
     this.data.auditLogs = [
-      { timestamp: new Date().toLocaleTimeString(), event: `ACCESSNEXA: Disruption ${target?.title} status changed to ${target?.active ? 'ACTIVE' : 'RESOLVED'}` },
+      { timestamp: new Date().toLocaleTimeString(), event: `DAFFODILS: Disruption ${target?.title} status changed to ${target?.active ? 'ACTIVE' : 'RESOLVED'}` },
       ...this.data.auditLogs
     ];
     this.saveState(this.data);
@@ -491,7 +486,7 @@ class StorageService {
     });
 
     this.data.auditLogs = [
-      { timestamp: new Date().toLocaleTimeString(), event: `ACCESSNEXA: Autonomous reroute executed for ${vehicleId}. Projected ETA recovered by 8 mins.` },
+      { timestamp: new Date().toLocaleTimeString(), event: `DAFFODILS: Autonomous reroute executed for ${vehicleId}. Projected ETA recovered by 8 mins.` },
       ...this.data.auditLogs
     ];
     this.saveState(this.data);

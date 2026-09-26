@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Package, 
   Box, 
@@ -15,6 +15,7 @@ import {
   ArrowRight,
   AlertCircle
 } from 'lucide-react';
+import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
 export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicle, vehicles }) {
@@ -25,6 +26,9 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
   const [pickupAddress, setPickupAddress] = useState('Flat 4B, Silver Oak, Gariahat Road');
   const [deliveryAddress, setDeliveryAddress] = useState('Tower 12, Rosedale Garden, New Town');
   const [insuranceValue, setInsuranceValue] = useState(750000);
+
+  const containerRef = useRef(null);
+  const volumeDisplayRef = useRef(null);
 
   // Selected item counters
   const [items, setItems] = useState({
@@ -44,6 +48,25 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
   const totalVolume = Object.values(items).reduce((acc, item) => acc + (item.count * item.volumeEach), 0);
   const totalWeight = Math.round(totalVolume * 2.4);
 
+  // GSAP Smooth Volume Counter Pop
+  useEffect(() => {
+    if (volumeDisplayRef.current) {
+      gsap.fromTo(volumeDisplayRef.current,
+        { scale: 1.15, color: '#fbbf24' },
+        { scale: 1, color: '#c084fc', duration: 0.35, ease: 'power2.out' }
+      );
+    }
+  }, [totalVolume]);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.fromTo(containerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, []);
+
   // Recommend truck
   let recommendedTruck = 'Tata Ace (7ft Open/Closed)';
   let requiredCrew = '2 Packing Technicians';
@@ -59,7 +82,6 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
     baseFreight = 8200;
   }
 
-  // Cost computation
   const tierCostMultiplier = packingTier.includes('Wooden') ? 1.4 : packingTier.includes('Premium') ? 1.2 : 1.0;
   const packingCost = Math.round(totalVolume * 4.5 * tierCostMultiplier);
   const insurancePremium = Math.round(insuranceValue * 0.0035);
@@ -111,7 +133,7 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
               LOGISTICS PILLAR 3
             </span>
             <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-              ACCESSNEXA Volumetric & Chain-of-Custody Engine
+              Daffodils Volumetric & Chain-of-Custody Engine
             </span>
           </div>
           <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
@@ -143,14 +165,14 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
           <div>
             <div style={{ fontWeight: '700', color: '#34d399' }}>Relocation Order Successfully Scheduled!</div>
             <div style={{ fontSize: '12px', color: '#cbd5e1' }}>
-              Manifest generated, crew allocated, and relocation van #VN-MOV-303 is tracked live on the GIS matrix.
+              Manifest generated, crew allocated, and relocation van #DAF-MOV-303 is tracked live on the GIS matrix.
             </div>
           </div>
         </div>
       )}
 
       {/* Main Grid: Volumetric Estimator & Live Order Pipeline */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
+      <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
         
         {/* Left Column: Volumetric Inventory Engine & Quote Configurator */}
         <div className="glass-panel" style={{ padding: '20px' }}>
@@ -230,12 +252,12 @@ export default function PackersMoversTab({ orders, onCreateOrder, onSelectVehicl
               </div>
             </div>
 
-            {/* Real-Time Mathematical Output Card */}
+            {/* Real-Time Mathematical Output Card with GSAP Pop */}
             <div className="glass-card" style={{ padding: '14px', marginBottom: '16px', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', textAlign: 'center' }}>
                 <div>
                   <div style={{ fontSize: '10px', color: '#94a3b8' }}>TOTAL VOLUME</div>
-                  <div style={{ fontSize: '16px', fontWeight: '800', color: '#c084fc' }}>
+                  <div ref={volumeDisplayRef} style={{ fontSize: '16px', fontWeight: '800', color: '#c084fc' }}>
                     {totalVolume} <span style={{ fontSize: '11px' }}>Cu.Ft</span>
                   </div>
                 </div>

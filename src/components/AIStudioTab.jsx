@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Cpu, 
   Mic, 
@@ -13,22 +13,31 @@ import {
   Layers,
   ShieldCheck
 } from 'lucide-react';
+import gsap from 'gsap';
 import { aiService } from '../services/aiService';
 import { soundFx } from '../services/soundService';
 
 export default function AIStudioTab() {
-  // Voice State
   const [voiceQuery, setVoiceQuery] = useState('');
   const [voiceResponse, setVoiceResponse] = useState(null);
   const [isListening, setIsListening] = useState(false);
 
-  // CV Inspection State
   const [cvResult, setCvResult] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
 
-  // RAG Search State
   const [ragQuery, setRagQuery] = useState('cold chain protocol');
   const [ragResult, setRagResult] = useState(aiService.queryOperationalKnowledge('cold chain protocol'));
+
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.fromTo(containerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, []);
 
   const handleStartVoice = () => {
     setIsListening(true);
@@ -40,7 +49,6 @@ export default function AIStudioTab() {
       },
       (err) => {
         setIsListening(false);
-        // Fallback simulation
         const sampleQuery = 'Status of Ambulance Lifeline Corridor';
         aiService.handleVoiceCommand(sampleQuery, (res) => {
           setVoiceQuery(sampleQuery);
@@ -85,7 +93,7 @@ export default function AIStudioTab() {
               MULTIMODAL INTELLIGENCE PILLAR 6
             </span>
             <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-              ACCESSNEXA Conversational Voice AI, Computer Vision & RAG SOP Matrix
+              Daffodils Conversational Voice AI, Computer Vision & RAG SOP Matrix
             </span>
           </div>
           <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
@@ -95,7 +103,7 @@ export default function AIStudioTab() {
       </div>
 
       {/* 3-Column AI Capabilities Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px' }}>
+      <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px' }}>
         
         {/* Module 1: Conversational Voice AI Dispatcher */}
         <div className="glass-panel" style={{ padding: '20px', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
@@ -141,7 +149,7 @@ export default function AIStudioTab() {
           {voiceResponse && (
             <div className="glass-card" style={{ padding: '12px', background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
               <div style={{ fontSize: '10px', color: '#22d3ee', fontWeight: '700' }}>
-                ACCESSNEXA VOICE RESPONSE:
+                DAFFODILS VOICE RESPONSE:
               </div>
               <div style={{ fontSize: '12.5px', color: '#f8fafc', marginTop: '4px' }}>
                 {voiceResponse.response}
@@ -186,7 +194,7 @@ export default function AIStudioTab() {
             <div style={{ textAlign: 'center', padding: '24px 0' }}>
               <span className="pulsing-green-dot"></span>
               <div style={{ fontSize: '12px', color: '#c084fc', marginTop: '8px' }}>
-                ACCESSNEXA YOLO Neural Bounding Box Extraction...
+                Daffodils YOLO Neural Bounding Box Extraction...
               </div>
             </div>
           ) : cvResult ? (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   BrainCircuit, 
   AlertTriangle, 
@@ -13,11 +13,33 @@ import {
   ArrowRight,
   ShieldCheck
 } from 'lucide-react';
+import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
-export default function AccessNexaSimulator({ disruptions, onToggleDisruption, onExecuteReroute, vehicles }) {
+export default function DisruptionSimulator({ disruptions, onToggleDisruption, onExecuteReroute, vehicles }) {
   const [selectedDisruption, setSelectedDisruption] = useState(disruptions[0] || null);
   const [reroutingVehicleId, setReroutingVehicleId] = useState(null);
+
+  const containerRef = useRef(null);
+  const impactCardRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.fromTo(containerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (impactCardRef.current) {
+      gsap.fromTo(impactCardRef.current,
+        { scale: 0.97, opacity: 0.8 },
+        { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.5)' }
+      );
+    }
+  }, [selectedDisruption]);
 
   const scenarios = [
     {
@@ -42,7 +64,7 @@ export default function AccessNexaSimulator({ disruptions, onToggleDisruption, o
       lng: 88.4100,
       radiusMeters: 1200,
       summary: 'Commercial fuel tanker breakdown blocking 3 lanes on outer connector. Complete gridlock formed.',
-      affectedMissions: ['VN-AMB-911 (Ambulance)', 'VN-MOV-303 (Packers Van)'],
+      affectedMissions: ['DAF-AMB-911 (Ambulance)', 'DAF-MOV-303 (Packers Van)'],
       cascadingImpact: 'Emergency lifeline ETA projected to blow out from 7 mins to 34 mins without preemption.',
       contingencyPlan: 'Preempt Sector V Service Arterial. Force green cycles at Crossing 4B.'
     }
@@ -72,7 +94,7 @@ export default function AccessNexaSimulator({ disruptions, onToggleDisruption, o
               COGNITIVE CONTINUITY ENGINE
             </span>
             <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-              ACCESSNEXA Impact-Before-Incident Simulation Sandbox
+              Daffodils Impact-Before-Incident Simulation Sandbox
             </span>
           </div>
           <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
@@ -91,7 +113,7 @@ export default function AccessNexaSimulator({ disruptions, onToggleDisruption, o
       </div>
 
       {/* Main Grid: Disruption Scenario Injector & Predictive Impact Matrix */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.1fr) minmax(340px, 1.1fr)', gap: '18px' }}>
+      <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.1fr) minmax(340px, 1.1fr)', gap: '18px' }}>
         
         {/* Left: Disruption Injector & What-If Sandbox */}
         <div className="glass-panel" style={{ padding: '20px' }}>
@@ -154,19 +176,19 @@ export default function AccessNexaSimulator({ disruptions, onToggleDisruption, o
           </div>
 
           {/* Academic Capability Note */}
-          <div className="glass-card" style={{ padding: '12px 14px', background: 'rgba(6, 182, 212, 0.06)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
-            <div style={{ fontSize: '11px', color: '#22d3ee', fontWeight: '700' }}>
-              ACCESSNEXA COGNITIVE PRINCIPLE:
+          <div className="glass-card" style={{ padding: '12px 14px', background: 'rgba(245, 158, 11, 0.06)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+            <div style={{ fontSize: '11px', color: '#fbbf24', fontWeight: '700' }}>
+              DAFFODILS COGNITIVE PRINCIPLE:
             </div>
             <div style={{ fontSize: '11.5px', color: '#cbd5e1', marginTop: '2px' }}>
-              "Unlike conventional GPS apps that wait until vehicles are already stuck in traffic, ACCESSNEXA projects disruption vectors 30 minutes into the future and generates alternative continuity paths."
+              "Unlike conventional GPS apps that wait until vehicles are already stuck in traffic, Daffodils projects disruption vectors 30 minutes into the future and generates alternative continuity paths."
             </div>
           </div>
 
         </div>
 
         {/* Right: Predictive Impact Analysis & Autonomous Failover */}
-        <div className="glass-panel" style={{ padding: '20px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+        <div ref={impactCardRef} className="glass-panel" style={{ padding: '20px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
           <h3 style={{ fontSize: '15px', color: '#ffffff', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <GitFork size={18} color="#fbbf24" />
             <span>Impact-Before-Incident Cascading Graph</span>
@@ -214,30 +236,30 @@ export default function AccessNexaSimulator({ disruptions, onToggleDisruption, o
               {/* Action Buttons for active vehicles */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <button
-                  onClick={() => handleRerouteClick('VN-FRT-502')}
-                  disabled={reroutingVehicleId === 'VN-FRT-502'}
+                  onClick={() => handleRerouteClick('DAF-FRT-502')}
+                  disabled={reroutingVehicleId === 'DAF-FRT-502'}
                   className="btn-primary"
                   style={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)'
                   }}
                 >
-                  <RefreshCw size={15} className={reroutingVehicleId === 'VN-FRT-502' ? 'animate-spin' : ''} />
+                  <RefreshCw size={15} className={reroutingVehicleId === 'DAF-FRT-502' ? 'animate-spin' : ''} />
                   <span>
-                    {reroutingVehicleId === 'VN-FRT-502'
+                    {reroutingVehicleId === 'DAF-FRT-502'
                       ? 'Recomputing & Dispatching Bypass Waypoints...'
-                      : 'Execute Autonomous Reroute for VN-FRT-502 (Save 22 mins)'}
+                      : 'Execute Autonomous Reroute for DAF-FRT-502 (Save 22 mins)'}
                   </span>
                 </button>
 
                 <button
-                  onClick={() => handleRerouteClick('VN-CAB-101')}
-                  disabled={reroutingVehicleId === 'VN-CAB-101'}
+                  onClick={() => handleRerouteClick('DAF-CAB-101')}
+                  disabled={reroutingVehicleId === 'DAF-CAB-101'}
                   className="btn-ghost"
-                  style={{ borderColor: 'rgba(6, 182, 212, 0.4)', color: '#22d3ee' }}
+                  style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
                 >
                   <Zap size={14} />
-                  <span>Execute Reroute for Mobility Cab VN-CAB-101</span>
+                  <span>Execute Reroute for Mobility Cab DAF-CAB-101</span>
                 </button>
               </div>
 

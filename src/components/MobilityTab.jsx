@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Car, 
   MapPin, 
@@ -12,6 +12,7 @@ import {
   Star,
   ArrowRight
 } from 'lucide-react';
+import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
 export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
@@ -20,6 +21,17 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
   const [selectedTier, setSelectedTier] = useState('EV_SEDAN');
   const [isMatching, setIsMatching] = useState(false);
   const [matchedBooking, setMatchedBooking] = useState(null);
+
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.fromTo(containerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, []);
 
   const rideTiers = [
     {
@@ -60,7 +72,6 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
     setIsMatching(true);
     soundFx.playRadarPing();
 
-    // Realistic driver matching sequence
     setTimeout(() => {
       const result = onBookRide({
         pickup,
@@ -95,7 +106,7 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
               MOBILITY PILLAR 1
             </span>
             <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-              ACCESSNEXA Dynamic Spatial Matching & Telematics
+              Daffodils Dynamic Spatial Matching & Telematics
             </span>
           </div>
           <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
@@ -114,7 +125,7 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
       </div>
 
       {/* Main Booking & Dispatch Columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
+      <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
         
         {/* Left: Ride Request Form */}
         <div className="glass-panel" style={{ padding: '20px' }}>
@@ -222,7 +233,7 @@ export default function MobilityTab({ vehicles, onBookRide, onSelectVehicle }) {
               {isMatching ? (
                 <>
                   <span className="pulsing-green-dot"></span>
-                  <span>ACCESSNEXA Spatial Sonar Matching...</span>
+                  <span>Daffodils Spatial Sonar Matching...</span>
                 </>
               ) : (
                 <>

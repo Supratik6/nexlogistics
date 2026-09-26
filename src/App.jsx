@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import MapView from './components/MapView';
@@ -6,11 +6,12 @@ import MobilityTab from './components/MobilityTab';
 import FreightTab from './components/FreightTab';
 import PackersMoversTab from './components/PackersMoversTab';
 import AmbulanceTab from './components/AmbulanceTab';
-import AccessNexaSimulator from './components/AccessNexaSimulator';
+import DisruptionSimulator from './components/DisruptionSimulator';
 import AIStudioTab from './components/AIStudioTab';
 import VoiceModal from './components/VoiceModal';
 import { storageService } from './services/storageService';
 import { soundFx } from './services/soundService';
+import gsap from 'gsap';
 
 export default function App() {
   const [appState, setAppState] = useState(storageService.getState());
@@ -18,11 +19,12 @@ export default function App() {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
+  const mainViewRef = useRef(null);
+
   // Subscribe to storage service updates (includes 2s simulated telemetry ticker)
   useEffect(() => {
     const unsubscribe = storageService.subscribe((newState) => {
       setAppState({ ...newState });
-      // Keep selected vehicle data synced
       if (selectedVehicle) {
         const updated = newState.vehicles.find(v => v.id === selectedVehicle.id);
         if (updated) setSelectedVehicle(updated);
@@ -30,6 +32,16 @@ export default function App() {
     });
     return () => unsubscribe();
   }, [selectedVehicle]);
+
+  // GSAP Smooth Tab View Transition
+  useEffect(() => {
+    if (mainViewRef.current) {
+      gsap.fromTo(mainViewRef.current,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' }
+      );
+    }
+  }, [activeTab]);
 
   const handleReset = () => {
     storageService.resetToDefault();
@@ -63,9 +75,9 @@ export default function App() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'radial-gradient(ellipse at top, #0b1426 0%, #050811 100%)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'radial-gradient(ellipse at top, #0d1527 0%, #050811 100%)' }}>
       
-      {/* Top Military/Command Header */}
+      {/* Top Command Header */}
       <Header
         system={appState.system}
         onReset={handleReset}
@@ -81,8 +93,8 @@ export default function App() {
         disruptionCount={appState.disruptions.filter(d => d.active).length}
       />
 
-      {/* Main Dynamic Viewport */}
-      <main style={{ flex: 1 }}>
+      {/* Main Dynamic Viewport with GSAP Smooth Transition */}
+      <main ref={mainViewRef} style={{ flex: 1 }}>
         {activeTab === 'map' && (
           <div style={{ padding: '0 18px 18px 18px' }}>
             <MapView
@@ -128,8 +140,8 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'accessnexa' && (
-          <AccessNexaSimulator
+        {activeTab === 'disruption' && (
+          <DisruptionSimulator
             disruptions={appState.disruptions}
             onToggleDisruption={handleToggleDisruption}
             onExecuteReroute={handleExecuteReroute}
@@ -164,11 +176,11 @@ export default function App() {
         color: '#94a3b8'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontWeight: '700', color: '#f1f5f9' }}>VYONEX v1.4</span>
+          <span style={{ fontWeight: '800', color: '#fbbf24', letterSpacing: '0.04em' }}>DAFFODILS</span>
           <span>•</span>
-          <span>Architected by <strong>Team NEXORA</strong> (B.Tech CSE Capstone Project)</span>
+          <span>Real-Time Mobility, Logistics & Continuity Intelligence Platform</span>
           <span>•</span>
-          <span style={{ color: '#06b6d4' }}>ACCESSNEXA Intelligence Core</span>
+          <span style={{ color: '#06b6d4' }}>Daffodils Cognitive Core</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -180,7 +192,7 @@ export default function App() {
           </div>
           <span style={{ color: '#475569' }}>|</span>
           <span className="mono" style={{ color: '#cbd5e1' }}>
-            Local Storage Telematics Buffer: ONLINE
+            Telemetry Stream Ingestion: ONLINE
           </span>
         </div>
       </footer>

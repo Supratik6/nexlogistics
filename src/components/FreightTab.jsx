@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   Truck, 
   ThermometerSnowflake, 
@@ -11,10 +11,21 @@ import {
   ArrowRight,
   TrendingDown
 } from 'lucide-react';
+import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
 export default function FreightTab({ vehicles, onSelectVehicle }) {
   const freightUnits = vehicles.filter(v => v.type === 'FREIGHT');
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.fromTo(containerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, []);
 
   return (
     <div style={{ padding: '0 18px 24px 18px' }}>
@@ -27,7 +38,7 @@ export default function FreightTab({ vehicles, onSelectVehicle }) {
               SUPPLY CHAIN PILLAR 2
             </span>
             <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-              ACCESSNEXA Cold-Chain & Multi-Waypoint Logistics Matrix
+              Daffodils Cold-Chain & Multi-Waypoint Logistics Matrix
             </span>
           </div>
           <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
@@ -46,7 +57,7 @@ export default function FreightTab({ vehicles, onSelectVehicle }) {
       </div>
 
       {/* Main Grid: Active Freight Telematics & Multi-Stop Manifests */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
+      <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
         
         {/* Left Column: Cold Chain Sensor Dashboard */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

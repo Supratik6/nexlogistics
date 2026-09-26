@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   MapPin, 
   Car, 
@@ -6,12 +6,23 @@ import {
   Package, 
   Siren, 
   BrainCircuit, 
-  Cpu, 
-  Activity 
+  Cpu 
 } from 'lucide-react';
+import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
 export default function Navigation({ activeTab, setActiveTab, vehicles, emergencyCount, disruptionCount }) {
+  const navContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (navContainerRef.current) {
+      gsap.fromTo(navContainerRef.current.children,
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.05, ease: 'power2.out' }
+      );
+    }
+  }, []);
+
   const tabs = [
     {
       id: 'map',
@@ -49,8 +60,8 @@ export default function Navigation({ activeTab, setActiveTab, vehicles, emergenc
       badgeType: 'badge-crimson'
     },
     {
-      id: 'accessnexa',
-      label: 'ACCESSNEXA Disruption',
+      id: 'disruption',
+      label: 'Disruption & Continuity',
       icon: BrainCircuit,
       badge: disruptionCount > 0 ? `${disruptionCount} Hazards` : 'Clear',
       badgeType: 'badge-amber'
@@ -64,39 +75,51 @@ export default function Navigation({ activeTab, setActiveTab, vehicles, emergenc
     }
   ];
 
-  const handleTabChange = (tabId) => {
+  const handleTabChange = (tabId, e) => {
     setActiveTab(tabId);
     soundFx.playRadarPing();
+    
+    // GSAP Micro-click bounce
+    if (e?.currentTarget) {
+      gsap.fromTo(e.currentTarget,
+        { scale: 0.94 },
+        { scale: 1, duration: 0.35, ease: 'back.out(2)' }
+      );
+    }
   };
 
   return (
     <nav style={{ margin: '0 18px 12px 18px' }}>
-      <div className="glass-panel" style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto' }}>
+      <div 
+        ref={navContainerRef}
+        className="glass-panel" 
+        style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto' }}
+      >
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
+              onClick={(e) => handleTabChange(tab.id, e)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '9px',
                 padding: '10px 16px',
                 borderRadius: '10px',
-                border: isActive ? '1px solid rgba(6, 182, 212, 0.45)' : '1px solid transparent',
+                border: isActive ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid transparent',
                 background: isActive 
-                  ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.16) 0%, rgba(99, 102, 241, 0.12) 100%)' 
+                  ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(6, 182, 212, 0.14) 100%)' 
                   : 'transparent',
-                color: isActive ? '#38bdf8' : '#94a3b8',
+                color: isActive ? '#fde68a' : '#94a3b8',
                 cursor: 'pointer',
                 fontFamily: 'var(--font-heading)',
                 fontSize: '13px',
                 fontWeight: isActive ? '700' : '500',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                 whiteSpace: 'nowrap',
-                boxShadow: isActive ? '0 0 16px rgba(6, 182, 212, 0.2)' : 'none'
+                boxShadow: isActive ? '0 0 16px rgba(245, 158, 11, 0.2)' : 'none'
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -111,7 +134,7 @@ export default function Navigation({ activeTab, setActiveTab, vehicles, emergenc
                 }
               }}
             >
-              <Icon size={16} color={isActive ? '#38bdf8' : '#94a3b8'} />
+              <Icon size={16} color={isActive ? '#fbbf24' : '#94a3b8'} />
               <span>{tab.label}</span>
               <span className={`badge-status ${tab.badgeType}`} style={{ fontSize: '10px', padding: '2px 7px' }}>
                 {tab.badge}

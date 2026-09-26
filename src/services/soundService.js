@@ -1,4 +1,4 @@
-// Web Audio API Sound Synthesizer for VYONEX Command Center
+// Web Audio API Sound Synthesizer for DAFFODILS Command Center
 class SoundEffectsService {
   constructor() {
     this.ctx = null;

@@ -1,4 +1,4 @@
-// VYONEX Multimodal AI, Voice Dispatcher & CV Inspector Service
+// Daffodils Multimodal AI, Voice Dispatcher & CV Inspector Service
 import { soundFx } from './soundService';
 
 class AIService {
@@ -63,7 +63,7 @@ class AIService {
     }
   }
 
-  // Interpret Voice Commands with ACCESSNEXA NLP parser
+  // Interpret Voice Commands with Daffodils NLP parser
   handleVoiceCommand(commandText, callback) {
     const text = commandText.toLowerCase();
     let responseText = '';
@@ -71,10 +71,10 @@ class AIService {
 
     if (text.includes('ambulance') || text.includes('emergency') || text.includes('hospital')) {
       actionType = 'AMBULANCE_DISPATCH';
-      responseText = 'ACCESSNEXA Alert: Priority-0 Lifeline Corridor activated. Traffic signals preempted on route to trauma center.';
+      responseText = 'Daffodils Alert: Priority-0 Lifeline Corridor activated. Traffic signals preempted on route to trauma center.';
     } else if (text.includes('reroute') || text.includes('traffic') || text.includes('delay')) {
       actionType = 'REROUTE_SUGGESTION';
-      responseText = 'ACCESSNEXA Disruption Engine: Alternative Bypass calculated. Diverting vehicle to save 14 minutes.';
+      responseText = 'Daffodils Disruption Engine: Alternative Bypass calculated. Diverting vehicle to save 14 minutes.';
     } else if (text.includes('mover') || text.includes('packing') || text.includes('relocation')) {
       actionType = 'MOVERS_STATUS';
       responseText = 'Relocation Mission #PM-2026-881 is in transit. All 6 crates secured. ETA at destination is 38 minutes.';
@@ -83,7 +83,7 @@ class AIService {
       responseText = 'System Status: All 5 active fleet nodes transmitting healthy telematics. No critical mechanical breaches.';
     } else {
       actionType = 'AI_INSIGHT';
-      responseText = `Understood: "${commandText}". ACCESSNEXA cognitive model is monitoring the spatial network.`;
+      responseText = `Understood: "${commandText}". Daffodils cognitive model is monitoring the spatial network.`;
     }
 
     this.speak(responseText);
@@ -110,7 +110,7 @@ class AIService {
       damageDetected: hasDamage,
       details: hasDamage
         ? 'Surface abrasion and 4.2 degree box tilt detected on packaging carton. Recommend manual inspection at destination bay.'
-        : 'Packaging integrity 100% sound. QR security code matches manifest #VN-884. Zero structural deformity detected.',
+        : 'Packaging integrity 100% sound. QR security code matches manifest #DAF-884. Zero structural deformity detected.',
       boundingCount: hasDamage ? 2 : 1,
       fragilityScore: hasDamage ? 'HIGH_RISK' : 'OPTIMAL_SECURITY'
     };
@@ -123,7 +123,7 @@ class AIService {
       {
         topic: 'Cold Chain Pharma Compliance',
         tags: ['cold chain', 'temperature', 'pharma', 'vaccine'],
-        protocol: 'SOP-COLD-04: Reefer temperature must remain between -18°C and -22°C. If sensor exceeds -15°C for >12 minutes, ACCESSNEXA triggers automated emergency reroute to nearest secondary cold storage depot.'
+        protocol: 'SOP-COLD-04: Reefer temperature must remain between -18°C and -22°C. If sensor exceeds -15°C for >12 minutes, Daffodils triggers automated emergency reroute to nearest secondary cold storage depot.'
       },
       {
         topic: 'Emergency Lifeline Signal Preemption',
@@ -136,8 +136,8 @@ class AIService {
         protocol: 'SOP-MOVE-09: All fragile electronics, marble surfaces, and glassware undergo 3-layer bubble + foam encapsulation with photographic timestamping prior to loading. Claims require pre-move and post-unboxing cryptographic verification.'
       },
       {
-        topic: 'ACCESSNEXA Impact-Before-Incident Cascading Logic',
-        tags: ['disruption', 'delay', 'flood', 'reroute', 'accessnexa'],
+        topic: 'Daffodils Impact-Before-Incident Cascading Logic',
+        tags: ['disruption', 'delay', 'flood', 'reroute', 'daffodils'],
         protocol: 'CORE-ALGO-02: Predicts cascading logistics delays by traversing weighted directed route graphs. Calculates secondary impact to subsequent scheduled missions before congestion occurs.'
       }
     ];

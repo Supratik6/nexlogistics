@@ -1,8 +1,8 @@
-# VYONEX — Executive Project & Mentor Presentation Manual
+# DAFFODILS — Executive Project & Mentor Presentation Manual
 
-> **Product Title:** VYONEX — Real-Time Mobility, Logistics & Continuity Intelligence Platform  
+> **Product Title:** Daffodils — Real-Time Mobility, Logistics & Continuity Intelligence Platform  
 > **Team:** NEXORA  
-> **Cognitive Core:** ACCESSNEXA v1.4.2  
+> **Cognitive Core:** Daffodils Engine v2.0  
 > **Signature Paradigm:** Impact-Before-Incident Intelligence  
 > **Project Type:** B.Tech CSE Final Year Project (FYP)  
 > **Motto:** *“From Where Things Are → To What Happens Next.”*  
@@ -15,7 +15,7 @@ When presenting to your college faculty, mentor, or external examiner, deliver t
 
 > *"Respected Sir/Ma'am, traditional logistics and tracking software are purely **passive**—they show a vehicle on a map, but cannot foresee the operational consequences of unexpected delays.*
 >
-> *We have engineered **VYONEX**, powered by the **ACCESSNEXA Cognitive Continuity Engine**. Instead of only recording current GPS coordinates, VYONEX projects disruption vectors 30–45 minutes into the future to protect mission continuity.*
+> *We have engineered **Daffodils**, powered by the **Daffodils Cognitive Continuity Engine**. Instead of only recording current GPS coordinates, Daffodils projects disruption vectors 30–45 minutes into the future to protect mission continuity.*
 >
 > *Across **Phase 1 and Phase 2 (currently evaluated at 68.4% milestone completion)**, we have developed and verified the full real-time GIS telemetry matrix, On-Demand Urban Mobility dispatch, Enterprise Cold-Chain Freight monitoring, a specialized Packers & Movers Volumetric Calculator with 6-stage chain-of-custody, a Priority-0 Lifeline Ambulance Green Corridor with live patient ECG vitals telemetry, and our predictive disruption simulation sandbox.*
 >

@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Flame
 } from 'lucide-react';
+import gsap from 'gsap';
 import { soundFx } from '../services/soundService';
 
 export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onSelectVehicle, vehicles }) {
@@ -25,6 +26,16 @@ export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onS
 
   const canvasRef = useRef(null);
   const ecgOffsetRef = useRef(0);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      gsap.fromTo(containerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, []);
 
   // Live ECG Waveform Animation Canvas
   useEffect(() => {
@@ -43,7 +54,7 @@ export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onS
       for (let x = 0; x < canvas.width; x += 20) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
+        ctx.lineTo(canvas.height);
         ctx.stroke();
       }
       for (let y = 0; y < canvas.height; y += 20) {
@@ -69,15 +80,15 @@ export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onS
 
         // P-Q-R-S-T wave simulation
         if (relX > 40 && relX < 50) {
-          y = midY - 6; // P wave
+          y = midY - 6;
         } else if (relX >= 50 && relX < 55) {
-          y = midY + 4; // Q wave
+          y = midY + 4;
         } else if (relX >= 55 && relX < 65) {
-          y = midY - 32; // R peak
+          y = midY - 32;
         } else if (relX >= 65 && relX < 72) {
-          y = midY + 12; // S dip
+          y = midY + 12;
         } else if (relX >= 80 && relX < 95) {
-          y = midY - 10; // T wave
+          y = midY - 10;
         }
 
         if (x === 0) ctx.moveTo(x, y);
@@ -124,7 +135,7 @@ export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onS
               PUBLIC SAFETY PILLAR 4
             </span>
             <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-              ACCESSNEXA Priority-0 Lifeline Corridor & Preemption Engine
+              Daffodils Priority-0 Lifeline Corridor & Preemption Engine
             </span>
           </div>
           <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
@@ -165,7 +176,7 @@ export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onS
       )}
 
       {/* Main Grid: Telemetry & Dispatch Form */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
+      <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 1.2fr) minmax(320px, 1fr)', gap: '18px' }}>
         
         {/* Left Column: Live Emergency Dispatcher & Vitals Stream */}
         <div className="glass-panel" style={{ padding: '20px' }}>
@@ -331,7 +342,7 @@ export default function AmbulanceTab({ emergencyAlerts, onDispatchAmbulance, onS
             </div>
 
             <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '14px' }}>
-              ACCESSNEXA communicates with municipal traffic controllers along the emergency path, extending green cycles and holding crossing nodes to guarantee continuous non-stop transit.
+              Daffodils communicates with municipal traffic controllers along the emergency path, extending green cycles and holding crossing nodes to guarantee continuous non-stop transit.
             </p>
 
             {/* Intersections Table */}

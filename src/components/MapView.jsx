@@ -333,7 +333,7 @@ export default function MapView({ vehicles, disruptions, emergencyAlerts, onSele
           onClick={handleTrackMyGps}
           className="btn-primary"
           style={{ padding: '7px 14px', fontSize: '12px', borderRadius: '8px' }}
-          title="Connect browser/phone GPS sensor directly into VYONEX"
+          title="Connect browser/phone GPS sensor directly into Daffodils"
         >
           <Crosshair size={14} />
           <span>{userGpsActive ? 'My GPS Active' : 'My Real GPS Pin'}</span>
